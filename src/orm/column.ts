@@ -251,6 +251,22 @@ type NormaliseEnumValues<V extends EnumValuesTuple | EnumValues> =
 				[T in V[number]]: T;
 			}
 		: V;
+export function chEnum<
+  I extends string,
+  const V extends EnumValues | EnumValuesTuple
+>(
+ 	identifier: I,
+	values: V,
+	options?: Except<
+		Required<EnumColumn<EnumIntSize, NormaliseEnumValues<V>>>["options"],
+		"values"
+	>,
+): ColumnBuilder<
+	EnumColumn<EnumIntSize, NormaliseEnumValues<V>>,
+	I,
+	false,
+	undefined
+>;
 export function chEnum<const V extends EnumValues | EnumValuesTuple>(
 	values: V,
 	options?: Except<
