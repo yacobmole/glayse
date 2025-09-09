@@ -2,21 +2,19 @@
 	"name": "glayse",
 	"version": "0.0.1",
 	"type": "module",
-  "license": "MIT",
+	"license": "MIT",
 	"packageManager": "pnpm@10.15.0",
 	"repository": {
-    "type": "git",
-    "url": "git+https://github.com/yacobmole/glayse.git",
-    "directory": ""
-  },
-	"publishConfig":{
-  	"exports": {
-      "./orm": {
-        "types": "./dist/orm/index.d.mts",
-        "import": "./dist/orm/index.mjs",
-        "default": "./dist/orm/index.mjs"
-      }
-  	}
+		"type": "git",
+		"url": "git+https://github.com/yacobmole/glayse.git",
+		"directory": ""
+	},
+	"exports": {
+		"./orm": {
+			"types": "./dist/orm/index.d.mts",
+			"import": "./dist/orm/index.mjs",
+			"default": "./dist/orm/index.mjs"
+		}
 	},
 	"scripts": {
 		"format": "biome format",
@@ -26,18 +24,18 @@
 		"type:check": "tsc --noEmit",
 		"build": "unbuild"
 	},
- "files": [
-    "dist"
-  ],
+	"files": [
+		"dist"
+	],
 	"dependencies": {
 		"type-fest": "^4.41.0",
 		"typescript": "^5.9.2",
 		"unbuild": "^3.6.1",
-		"waddler": "^0.1.1"
+		"waddler": "^0.1.1",
+		"@clickhouse/client-common": "^1.12.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.3",
-		"@clickhouse/client-common": "^1.11.0",
 		"@types/node": "^24.3.1"
 	}
 }
