@@ -12,56 +12,67 @@ import type {
 	UIntColumn,
 } from "./data-types";
 
-export type DefaultFn<TColumn extends AnyColumn> = () => TSForColumn<TColumn>;
-export type DefaultSQL<TColumn extends AnyColumn> = TSForColumn<TColumn>;
-export type DefaultSQLStatement = { sql: true };
-export type AnyDefault =
-	| DefaultFn<AnyColumn>
-	| DefaultSQL<AnyColumn>
+export type DefaultFn<
+	TColumn extends AnyColumn,
+	TNullable extends boolean,
+> = () => TNullable extends true
+	? TSForColumn<TColumn> | null
+	: TSForColumn<TColumn>;
+export type DefaultSQL<
+	TColumn extends AnyColumn,
+	TNullable extends boolean,
+> = TNullable extends true ? TSForColumn<TColumn> | null : TSForColumn<TColumn>;
+export type Default<TColumn extends AnyColumn, TNullable extends boolean> =
+	| DefaultFn<TColumn, TNullable>
+	| DefaultSQL<TColumn, TNullable>
 	| undefined;
+export type AnyDefault = Default<AnyColumn, boolean>;
 
 export type ColumnDef<
 	TColumn extends AnyColumn,
 	TIdentifier extends string | undefined,
-	Nullable extends boolean,
-	TDefault extends DefaultFn<TColumn> | DefaultSQL<TColumn> | undefined,
+	TNullable extends boolean,
+	TDefault extends Default<TColumn, TNullable>,
 > = {
 	identifier: TIdentifier;
 	column: TColumn;
-	nullable: Nullable;
+	nullable: TNullable;
 	default: TDefault;
 };
 
 export class ColumnBuilder<
 	TColumn extends AnyColumn,
 	TIdentifier extends string | undefined,
-	Nullable extends boolean,
-	TDefault extends DefaultFn<TColumn> | DefaultSQL<TColumn> | undefined,
+	TNullable extends boolean,
+	TDefault extends Default<TColumn, TNullable>,
 > {
-	"+glayse": ColumnDef<TColumn, TIdentifier, Nullable, TDefault>;
+	"+glayse": ColumnDef<TColumn, TIdentifier, TNullable, TDefault>;
 
-	constructor(def: ColumnDef<TColumn, TIdentifier, Nullable, TDefault>) {
+	constructor(def: ColumnDef<TColumn, TIdentifier, TNullable, TDefault>) {
 		this["+glayse"] = def;
 	}
 
-	nullable(
-		this: ColumnBuilder<TColumn, TIdentifier, false, TDefault>,
-	): ColumnBuilder<TColumn, TIdentifier, true, TDefault>;
-	nullable(
-		this: ColumnBuilder<TColumn, TIdentifier, true, TDefault>,
-		state: false,
-	): ColumnBuilder<TColumn, TIdentifier, false, TDefault>;
-	nullable(state?: false) {
+	nullable() {
 		return new ColumnBuilder({
 			...this["+glayse"],
-			nullable: (state ?? true) as true | false, // inferred as true when undefined
-		});
+			nullable: true as boolean,
+		}) as ColumnBuilder<
+			TColumn,
+			TIdentifier,
+			true,
+			TDefault extends undefined ? undefined : Default<TColumn, true>
+		>;
 	}
 
 	default(
-		this: ColumnBuilder<TColumn, TIdentifier, Nullable, undefined>,
-		value: DefaultSQL<TColumn>,
-	): ColumnBuilder<TColumn, TIdentifier, Nullable, DefaultSQL<TColumn>> {
+		this: ColumnBuilder<TColumn, TIdentifier, TNullable, undefined>,
+		value: DefaultSQL<TColumn, TNullable>,
+	): ColumnBuilder<
+		TColumn,
+		TIdentifier,
+		TNullable,
+		DefaultSQL<TColumn, TNullable>
+	> {
 		return new ColumnBuilder({
 			...this["+glayse"],
 			default: value,
@@ -69,9 +80,14 @@ export class ColumnBuilder<
 	}
 
 	$defaultFn(
-		this: ColumnBuilder<TColumn, TIdentifier, Nullable, undefined>,
-		fn: DefaultFn<TColumn>,
-	): ColumnBuilder<TColumn, TIdentifier, Nullable, DefaultFn<TColumn>> {
+		this: ColumnBuilder<TColumn, TIdentifier, TNullable, undefined>,
+		fn: DefaultFn<TColumn, TNullable>,
+	): ColumnBuilder<
+		TColumn,
+		TIdentifier,
+		TNullable,
+		DefaultFn<TColumn, TNullable>
+	> {
 		return new ColumnBuilder({
 			...this["+glayse"],
 			default: fn,
@@ -83,7 +99,7 @@ export type AnyColumnBuilder = ColumnBuilder<
 	AnyColumn,
 	string | undefined,
 	boolean,
-	DefaultFn<AnyColumn> | DefaultSQL<AnyColumn> | undefined
+	Default<AnyColumn, boolean>
 >;
 
 // Column Utility Functions
