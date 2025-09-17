@@ -1,4 +1,4 @@
-import { sql } from "./lib/sql";
+import { sql } from "../sql";
 import type { AnyTableBuilder } from "./table";
 
 export function _insertManySQL<T extends AnyTableBuilder>(

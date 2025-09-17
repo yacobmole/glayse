@@ -1,6 +1,6 @@
 {
 	"name": "glayse",
-	"version": "0.0.3",
+	"version": "0.1.0-beta",
 	"type": "module",
 	"license": "MIT",
 	"packageManager": "pnpm@10.15.0",
@@ -14,6 +14,11 @@
 			"types": "./dist/orm/index.d.mts",
 			"import": "./dist/orm/index.mjs",
 			"default": "./dist/orm/index.mjs"
+		},
+		"./sql": {
+			"types": "./dist/sql/index.d.mts",
+			"import": "./dist/sql/index.mjs",
+			"default": "./dist/sql/index.mjs"
 		}
 	},
 	"scripts": {
